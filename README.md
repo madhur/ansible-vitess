@@ -27,6 +27,10 @@ Feel free to raise any [issue]() you have encountered if any while setting it up
 
 ## Quick setup
 
+I have currently not uploaded this role to [Ansible Galaxy](https://galaxy.ansible.com/)
+
+Just clone the repo and copy the folders under `roles` directory into your own `roles` directory of your ansible repo. 
+
 Run below playbooks to setup vitess
 
 ### Topology server (Zookeeper)
@@ -241,7 +245,7 @@ Just cd into the any of the above folders and run `vagrant up` to start the prov
 In the sample setup, we provision each shard with one primary tablet and 2 replicas
 
 ### Future Roadmap
-
+* Add [Vitess ACL's](https://vitess.io/docs/17.0/user-guides/configuration-advanced/authorization/)
 * Add [etcd](https://etcd.io/) as topology server
 * Enable vtadmin UI interface
 
