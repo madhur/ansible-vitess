@@ -1,0 +1,4 @@
+- hosts: vttablet
+  roles:
+    - role: vitess-base
+    - role: vttablet

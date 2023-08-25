@@ -1,0 +1,6 @@
+---
+
+- name: restart vtctld
+  service:
+    name: vtctld
+    state: restarted

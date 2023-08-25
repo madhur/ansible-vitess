@@ -1,0 +1,23 @@
+# Systemd unit file Admin
+[Unit]
+Description=Admin
+After=syslog.target network.target
+
+[Service]
+ExecStart={{vitess_dir}}/bin/vtctld --topo_implementation zk2 --topo_global_server_address {{zk_host}} --topo_global_root {{topo_global_root}} --cell {{cell_name}} --durability_policy 'semi_sync' --log_dir {{log_dir}} --port {{vtadmin_port}} --grpc_port {{vtadmin_grpc_port}} --service_map 'grpc-vtctl,grpc-vtctld' --backup_storage_implementation file --file_backup_storage_root /data/vt/backups
+User=vitess
+Group=vitess
+WorkingDirectory={{vitess_dir}}
+Restart=on-failure
+RestartSec=1500ms
+KillMode=control-group
+SendSIGKILL=yes
+TimeoutSec=120
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=Admin
+LimitNOFILE=400000
+LimitNPROC=20000
+
+[Install]
+WantedBy=multi-user.target

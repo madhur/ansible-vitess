@@ -1,0 +1,249 @@
+---
+
+- name: Install the mysql
+  become: true
+  ansible.builtin.yum:
+    name: https://repo.mysql.com/mysql80-community-release-el7-3.noarch.rpm
+    state: present
+  when: install_mysql==true
+
+- name: Install the mysql
+  become: true
+  ansible.builtin.yum:
+    name: mysql-community-server
+    state: present
+    disable_gpg_check: true
+  when: install_mysql==true
+
+- name: Install the netstat
+  become: true
+  ansible.builtin.yum:
+    name: net-tools
+    state: present
+    disable_gpg_check: true
+
+- name: Stop and disable mysql service
+  become: true
+  service:
+    name:    mysqld
+    enabled: no
+    state:   stopped
+  when: install_mysql==true
+
+- name: make vitess data directory
+  become: true
+  file:
+    path: /data
+    state: directory
+    owner: vitess
+    group: vitess
+
+- name: copy init_commerce.sh
+  become: true
+  ansible.builtin.template:
+    src: templates/tablet.sh.j2
+    dest: /home/vitess/init_commerce.sh
+    mode: u=rwx,g=r,o=r
+    owner: vitess
+    group: vitess
+  vars:
+    tablet_id: "{{tablet_id_sharded}}"
+    mysql_port: "{{mysql_port_sharded}}"
+    action: init
+
+- name: copy init_commerce_unsharded.sh
+  become: true
+  ansible.builtin.template:
+    src: templates/tablet.sh.j2
+    dest: /home/vitess/init_commerce_unsharded.sh
+    mode: u=rwx,g=r,o=r
+    owner: vitess
+    group: vitess
+  vars:
+    tablet_id: "{{tablet_id_unsharded}}"
+    mysql_port: "{{mysql_port_unsharded}}"
+    action: init
+  when: mysql_port_unsharded is defined
+
+- name: copy shutdown_commerce.sh
+  become: true
+  ansible.builtin.template:
+    src: templates/tablet.sh.j2
+    dest: /home/vitess/shutdown_commerce.sh
+    mode: u=rwx,g=r,o=r
+    owner: vitess
+    group: vitess
+  vars:
+    tablet_id: "{{tablet_id_sharded}}"
+    mysql_port: "{{mysql_port_sharded}}"
+    action: shutdown
+
+- name: copy shutdown_commerce_unsharded.sh
+  become: true
+  ansible.builtin.template:
+    src: templates/tablet.sh.j2
+    dest: /home/vitess/shutdown_commerce_unsharded.sh
+    mode: u=rwx,g=r,o=r
+    owner: vitess
+    group: vitess
+  vars:
+    tablet_id: "{{tablet_id_unsharded}}"
+    mysql_port: "{{mysql_port_unsharded}}"
+    action: shutdown
+  when: mysql_port_unsharded is defined
+
+- name: copy start_commerce.sh
+  become: true
+  ansible.builtin.template:
+    src: templates/tablet.sh.j2
+    dest: /home/vitess/start_commerce.sh
+    mode: u=rwx,g=r,o=r
+    owner: vitess
+    group: vitess
+  vars:
+    tablet_id: "{{tablet_id_sharded}}"
+    mysql_port: "{{mysql_port_sharded}}"
+    action: start
+
+- name: copy teardown_commerce.sh
+  become: true
+  ansible.builtin.template:
+    src: templates/tablet.sh.j2
+    dest: /home/vitess/teardown_commerce.sh
+    mode: u=rwx,g=r,o=r
+    owner: vitess
+    group: vitess
+  vars:
+    tablet_id: "{{tablet_id_sharded}}"
+    mysql_port: "{{mysql_port_sharded}}"
+    action: teardown
+
+
+- name: copy teardown_commerce_unsharded.sh
+  become: true
+  ansible.builtin.template:
+    src: templates/tablet.sh.j2
+    dest: /home/vitess/teardown_commerce_unsharded.sh
+    mode: u=rwx,g=r,o=r
+    owner: vitess
+    group: vitess
+  vars:
+    tablet_id: "{{tablet_id_unsharded}}"
+    mysql_port: "{{mysql_port_unsharded}}"
+    action: teardown
+  when: mysql_port_unsharded is defined
+
+
+- name: copy start_commerce_unsharded.sh
+  become: true
+  ansible.builtin.template:
+    src: templates/tablet.sh.j2
+    dest: /home/vitess/start_commerce_unsharded.sh
+    mode: u=rwx,g=r,o=r
+    owner: vitess
+    group: vitess
+  vars:
+    tablet_id: "{{tablet_id_unsharded}}"
+    mysql_port: "{{mysql_port_unsharded}}"
+    action: start
+  when: mysql_port_unsharded is defined
+
+
+- name: copy commerce.service
+  become: true
+  ansible.builtin.template:
+    src: templates/commerce.service.j2
+    dest: /etc/systemd/system/commerce.service
+
+
+- name: copy commerce_unsharded.service
+  become: true
+  ansible.builtin.template:
+    src: templates/commerce_unsharded.service.j2
+    dest: /etc/systemd/system/commerce_unsharded.service
+  when: mysql_port_unsharded is defined
+
+- name: init commerce
+  become: true
+  become_user: vitess
+  ansible.builtin.shell: "/home/vitess/init_commerce.sh"
+  ignore_errors: True
+
+- ansible.builtin.include_tasks: my_cnf.yml
+  when: update_mycnf == true
+
+- name: init commerce_unsharded
+  become: true
+  become_user: vitess
+  ansible.builtin.shell: "/home/vitess/init_commerce_unsharded.sh"
+  ignore_errors: True
+  when: mysql_port_unsharded is defined
+
+- name: start commerce
+  become: true
+  become_user: vitess
+  ansible.builtin.shell: "/home/vitess/start_commerce.sh"
+  ignore_errors: True
+
+- name: start commerce_unsharded
+  become: true
+  become_user: vitess
+  ansible.builtin.shell: "/home/vitess/start_commerce_unsharded.sh"
+  ignore_errors: True
+  when: mysql_port_unsharded is defined
+
+
+- name: Just force systemd to reread configs (2.4 and above)
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: restart commerce
+  become: true
+  service:
+    name: commerce
+    state: restarted
+
+- name: restart commerce unsharded
+  become: true
+  service:
+    name: commerce_unsharded
+    state: restarted
+  when: mysql_port_unsharded is defined
+
+- name: copy schema files
+  become: true
+  ansible.builtin.copy:
+    src: files/
+    dest: /home/vitess/
+
+- name: Init shard primary commerce
+  become: true
+  become_user: vitess
+  ansible.builtin.shell: "{{vitess_dir}}/bin/vtctldclient --server {{vtadmin_ip}}:{{vtadmin_grpc_port}} --log_dir /tmp --alsologtostderr   InitShardPrimary   --force   commerce/{{shard_name}}   {{cell_name}}-{{tablet_id_sharded}}"
+  ignore_errors: True
+  when: init is defined and init|bool
+
+- name: Init shard primary commerce unsharded
+  become: true
+  become_user: vitess
+  ansible.builtin.shell: "{{vitess_dir}}/bin/vtctldclient --server {{vtadmin_ip}}:{{vtadmin_grpc_port}} --log_dir /tmp --alsologtostderr   InitShardPrimary   --force   commerce_unsharded/{{shard_name_unsharded}}   {{cell_name}}-{{tablet_id_unsharded}}"
+  ignore_errors: True
+  when: init is defined and init|bool and mysql_port_unsharded is defined
+
+- name: copy apply_schema.sh
+  become: true
+  ansible.builtin.template:
+    src: templates/apply_schema.sh.j2
+    dest: /home/vitess/apply_schema.sh
+    mode: u=rwx,g=r,o=r
+    owner: vitess
+    group: vitess
+  when: apply_schema is defined and apply_schema|bool
+
+- name: run apply schema
+  become: true
+  become_user: vitess
+  ansible.builtin.shell: "/home/vitess/apply_schema.sh"
+  ignore_errors: True
+  when: apply_schema is defined and apply_schema|bool

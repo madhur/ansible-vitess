@@ -1,0 +1,5 @@
+---
+- hosts: vtadmin
+  roles:
+    - role: vitess-base
+    - role: vtadmin

@@ -1,0 +1,31 @@
+
+  - name: "Check if my.cnf is updated"
+    become: yes
+    become_user: vitess
+    lineinfile:
+      path: "{{VTDATAROOT}}/vt_0000000{{tablet_id_sharded}}/my.cnf"
+      regexp: 'innodb_buffer_pool_size'
+      state: absent
+    check_mode: yes
+    register: out
+
+  - debug:
+      msg: "innodb_buffer_pool_size exists, not updating my.cnf"
+    when: out.found
+
+  - name: copy append script
+    become: true
+    ansible.builtin.template:
+      src: templates/append_my_cnf.sh.j2
+      dest: /home/vitess/append_my_cnf.sh
+      mode: u=rwx,g=r,o=r
+      owner: vitess
+      group: vitess
+    when: not out.found     
+
+  - name: run append script
+    become: true
+    become_user: vitess
+    ansible.builtin.shell: "/home/vitess/append_my_cnf.sh"
+    ignore_errors: True
+    when: not out.found

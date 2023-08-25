@@ -1,0 +1,29 @@
+[all:vars]
+ansible_connection=ssh
+ansible_user=vagrant
+vitess_user=vitess
+cell_name=cell1
+topo_global_root=/vitess/global
+vitess_dir=/usr/local/vitess
+VTDATAROOT=/data/vt
+vtadmin_ip=192.168.56.9
+vtadmin_grpc_port=15999
+zk_host=192.168.56.8
+
+[vtadmin]
+vtadmin ansible_host=192.168.56.9
+
+[vttablet]
+tablet10 ansible_host=192.168.56.20       tablet_id_sharded=200   shard_name=-80        tablet_id_unsharded=2000    shard_name_unsharded=0   tablet_port=15100   tablet_grpc_port=16100     tablet_port_unsharded=15101     tablet_grpc_port_unsharded=16101   mysql_port_sharded=3306  mysql_port_unsharded=3307
+tablet11 ansible_host=192.168.56.21       tablet_id_sharded=201   shard_name=-80        tablet_id_unsharded=2001    shard_name_unsharded=0   tablet_port=15100   tablet_grpc_port=16100     tablet_port_unsharded=15101     tablet_grpc_port_unsharded=16101   mysql_port_sharded=3306  mysql_port_unsharded=3307
+tablet12 ansible_host=192.168.56.22       tablet_id_sharded=202   shard_name=-80        tablet_id_unsharded=2002    shard_name_unsharded=0   tablet_port=15100   tablet_grpc_port=16100     tablet_port_unsharded=15101   tablet_grpc_port_unsharded=16101     mysql_port_sharded=3306  mysql_port_unsharded=3307   init=false
+
+tablet13 ansible_host=192.168.56.23       tablet_id_sharded=300   shard_name=80-         tablet_port=15100   tablet_grpc_port=16100         mysql_port_sharded=3306  
+tablet14 ansible_host=192.168.56.24       tablet_id_sharded=301   shard_name=80-         tablet_port=15100   tablet_grpc_port=16100        mysql_port_sharded=3306 
+tablet15 ansible_host=192.168.56.25       tablet_id_sharded=302   shard_name=80-         tablet_port=15100   tablet_grpc_port=16100        mysql_port_sharded=3306     init=false  apply_schema=false
+
+[vtgate]
+vtgate1 ansible_host=192.168.56.13
+
+[zookeeper-nodes]
+zookeeper1 ansible_host=192.168.56.8

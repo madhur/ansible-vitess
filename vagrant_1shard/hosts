@@ -1,0 +1,26 @@
+[all:vars]
+ansible_connection=ssh
+ansible_user=vagrant
+vitess_user=vitess
+cell_name=cell1
+topo_global_root=/vitess/global
+vitess_dir=/usr/local/vitess
+VTDATAROOT=/data/vt
+vtadmin_ip=192.168.56.9
+vtadmin_grpc_port=15999
+zk_host=192.168.56.8
+
+
+[vtadmin]
+vtadmin ansible_host=192.168.56.9
+
+[vttablet]
+tablet1 ansible_host=192.168.56.20       tablet_id_sharded=100   shard_name=0        tablet_id_unsharded=1000    shard_name_unsharded=0   tablet_port=15100   tablet_grpc_port=16100     tablet_port_unsharded=15101     tablet_grpc_port_unsharded=16101   mysql_port_sharded=3306  mysql_port_unsharded=3307
+tablet2 ansible_host=192.168.56.21       tablet_id_sharded=101   shard_name=0        tablet_id_unsharded=1001    shard_name_unsharded=0   tablet_port=15100   tablet_grpc_port=16100     tablet_port_unsharded=15101     tablet_grpc_port_unsharded=16101   mysql_port_sharded=3306  mysql_port_unsharded=3307
+tablet3 ansible_host=192.168.56.22       tablet_id_sharded=102   shard_name=0        tablet_id_unsharded=1002    shard_name_unsharded=0   tablet_port=15100   tablet_grpc_port=16100     tablet_port_unsharded=15101   tablet_grpc_port_unsharded=16101     mysql_port_sharded=3306  mysql_port_unsharded=3307   init=true  apply_schema=true
+
+[vtgate]
+vtgate1 ansible_host=192.168.56.13
+
+[zookeeper-nodes]
+zookeeper1 ansible_host=192.168.56.8

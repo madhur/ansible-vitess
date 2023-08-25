@@ -1,0 +1,5 @@
+## vtgate specific variables
+
+vtgate_mysql_port: 15306
+vtgate_port: 15001
+vtgate_grpc_port: 15991

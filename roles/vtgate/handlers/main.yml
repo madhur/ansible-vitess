@@ -1,0 +1,6 @@
+---
+
+- name: restart vtgate
+  service:
+    name: vtgate
+    state: restarted

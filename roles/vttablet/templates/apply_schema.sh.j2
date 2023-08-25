@@ -1,0 +1,7 @@
+{{vitess_dir}}/bin/vtctldclient  --server {{vtadmin_ip}}:{{vtadmin_grpc_port}}  --log_dir /tmp --alsologtostderr  ApplySchema --sql-file /home/vitess/commerce.sql commerce
+{{vitess_dir}}/bin/vtctldclient  --server {{vtadmin_ip}}:{{vtadmin_grpc_port}}  --log_dir /tmp --alsologtostderr  ApplySchema --sql-file /home/vitess/commerce_unsharded.sql commerce_unsharded
+{{vitess_dir}}/bin/vtctldclient  --server {{vtadmin_ip}}:{{vtadmin_grpc_port}}  --log_dir /tmp --alsologtostderr  ApplyVSchema --vschema-file /home/vitess/commerce_unsharded.json commerce_unsharded
+{{vitess_dir}}/bin/vtctldclient  --server {{vtadmin_ip}}:{{vtadmin_grpc_port}}  --log_dir /tmp --alsologtostderr  ApplyVSchema --vschema-file /home/vitess/commerce.json commerce
+
+{{vitess_dir}}/bin/vtctldclient SetKeyspaceDurabilityPolicy --server {{vtadmin_ip}}:{{vtadmin_grpc_port}}  --durability-policy='semi_sync' commerce_unsharded
+{{vitess_dir}}/bin/vtctldclient SetKeyspaceDurabilityPolicy --server {{vtadmin_ip}}:{{vtadmin_grpc_port}}  --durability-policy='semi_sync' commerce

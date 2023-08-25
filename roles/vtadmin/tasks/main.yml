@@ -1,0 +1,23 @@
+---
+- name: copy vtadmin.service
+  become: true
+  ansible.builtin.template:
+    src: templates/vtctld.service.j2
+    dest: /etc/systemd/system/vtctld.service
+
+- name: Just force systemd to reread configs (2.4 and above)
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: restart vtctld
+  become: true
+  service:
+    name: vtctld
+    state: restarted
+
+- name: create cell
+  become: true
+  become_user: vitess
+  ansible.builtin.shell: "{{vitess_dir}}/bin/vtctldclient AddCellInfo --root /vitess/{{cell_name}} --server localhost:{{vtadmin_grpc_port}} --log_dir {{log_dir}} --alsologtostderr   --server-address {{zk_host}} {{cell_name}}"
+  ignore_errors: True

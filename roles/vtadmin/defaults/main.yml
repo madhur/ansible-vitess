@@ -1,0 +1,3 @@
+vtadmin_port: 15000
+vtorc_port: 16000
+log_dir:  /tmp

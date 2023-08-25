@@ -1,0 +1,22 @@
+[Unit]
+Description=Vt-Gate
+After=syslog.target network.target
+
+[Service]
+ExecStart={{vitess_dir}}/bin/vtgate --topo_implementation zk2 --topo_global_server_address {{zk_host}} --topo_global_root {{topo_global_root}} --log_dir /home/vitess/logs --port {{vtgate_port}} --grpc_port {{vtgate_grpc_port}} --mysql_server_port {{vtgate_mysql_port}} --cell {{cell_name}} --cells_to_watch {{cell_name}} --tablet_types_to_wait PRIMARY,REPLICA --service_map 'grpc-vtgateservice' --pid_file /home/vitess/vtgate.pid --mysql_server_version '8.0.17 Source distribution' --allowed_tablet_types PRIMARY,REPLICA --mysql_auth_server_impl=static --mysql_auth_server_static_file=/home/vitess/auth.json
+User=vitess
+Group=vitess
+WorkingDirectory={{vitess_dir}}
+Restart=on-failure
+RestartSec=1500ms
+KillMode=control-group
+SendSIGKILL=yes
+TimeoutSec=120
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=Vt-Gate
+LimitNOFILE=400000
+LimitNPROC=20000
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,83 @@
+---
+- name: add vitess user
+  become: true
+  ansible.builtin.user:
+    name: vitess
+    create_home: true
+
+- name: make vitess directory
+  become: true
+  file:
+    path: "{{vitess_dir}}"
+    state: directory
+
+- name: make vitess directory
+  become_user: vitess
+  become: true
+  file:
+    path: /home/vitess/vitess
+    state: directory
+
+- name: ensure .bashrc
+  become: True
+  become_user: vitess
+  ansible.builtin.file:
+    path: /home/vitess/.bashrc
+    state: touch
+
+- name: update bash.rc
+  become: true
+  become_user: vitess
+  lineinfile:
+        dest: "~/.bashrc"
+        line: |
+          export PATH={{vitess_dir}}/bin:$PATH
+          alias ll='ls -ltr'
+          alias duh='du --all --human-readable --one-file-system --max-depth=1 | sort -h'
+          export VTDATAROOT={{VTDATAROOT}}
+
+- name: make vitess directory
+  become: true
+  become_user: vitess
+  file:
+    path: "/home/vitess/vitess"
+    state: directory
+
+- name: download vitess
+  become: true
+  become_user: vitess
+  ansible.builtin.unarchive:
+    src: "{{vitess_binary_url}}"
+    dest: /home/vitess/vitess
+    remote_src: yes
+  when: use_local_vitess_binary == false
+
+- name: extract vitess
+  become: true
+  become_user: vitess
+  ansible.builtin.unarchive:
+    src: files/{{vitess_file}}
+    dest: /home/vitess/vitess
+    creates: /home/vitess/vitess/{{vitess_folder}}/bin
+  when: use_local_vitess_binary == true
+
+- name: copy vitess
+  become: true
+  ansible.builtin.copy:
+    src: /home/vitess/vitess/{{vitess_folder}}/
+    dest: "{{vitess_dir}}"
+    remote_src: yes
+  when: use_local_vitess_binary == true
+
+# - name: copy updatehosts.sh
+#   become: true
+#   ansible.builtin.copy:
+#     src: files/updatehosts.sh
+#     dest: /home/vitess/
+#     mode: u=rwx,g=r,o=r
+#   when: update_hostfile == true
+
+# - name: run updatehosts.sh
+#   become: true
+#   ansible.builtin.shell: /home/vitess/updatehosts.sh
+#   when: update_hostfile == true

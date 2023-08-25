@@ -1,0 +1,4 @@
+- hosts: vtgate
+  roles:
+    - role: vitess-base
+    - role: vtgate

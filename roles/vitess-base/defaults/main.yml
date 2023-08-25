@@ -1,0 +1,10 @@
+use_local_vitess_binary: true  # ensure that vitess binary is placed in files/folder and its name is mentioned in vitess_file variable
+
+## Use the below properties if you are using `use_local_vitess_binary: true` . The vitess tar.gz must be placed in files/ folder
+vitess_file: vitess-16.0.2-6076fed.tar.gz
+vitess_folder: vitess-16.0.2-6076fed
+
+## Vitess binary url
+vitess_binary_url: 'https://github.com/vitessio/vitess/releases/download/v16.0.2/vitess-16.0.2-6076fed.tar.gz'
+
+update_hostfile: true

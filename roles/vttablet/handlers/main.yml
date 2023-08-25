@@ -1,0 +1,10 @@
+---
+- name: restart commerce
+  service:
+    name: commerce
+    state: restarted
+
+- name: restart commerce_unsharded
+  service:
+    name: commerce_unsharded
+    state: restarted

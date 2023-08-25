@@ -1,0 +1,6 @@
+---
+- hosts: zookeeper-nodes
+  become: True
+  roles:
+    - role: ansible-role-java
+    - role: ansible-zookeeper

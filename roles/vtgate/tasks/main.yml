@@ -1,0 +1,24 @@
+---
+
+- name: copy vtgate.service
+  become: true
+  ansible.builtin.template:
+    src: templates/vtgate.service.j2
+    dest: /etc/systemd/system/vtgate.service
+
+- name: copy auth.json
+  become: true
+  ansible.builtin.copy:
+    src: files/auth.json
+    dest: /home/vitess/auth.json
+
+- name: Just force systemd to reread configs (2.4 and above)
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: restart commerce
+  become: true
+  service:
+    name: vtgate
+    state: restarted
