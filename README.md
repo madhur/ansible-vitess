@@ -23,7 +23,7 @@ This ansible role has been tested on Vitess v16. The plan is to keep updating th
 ### Supported Platforms
 Currently, I have only tested this playbook on CentOS 7 and RHEL 7 platforms.
 
-Feel free to raise any [issue]() you have encountered if any while setting it up on another platform.
+Feel free to raise any [issue](https://github.com/madhur/ansible-vitess/issues) you have encountered if any while setting it up on another platform.
 
 ## Quick setup
 
